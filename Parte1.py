@@ -127,3 +127,39 @@ print("\nArchivo guardado: clasificacion_titulares_electorales.csv")
 #Dataframe
 df = df[df["Categoria"] != "📌 Otros"]
 df
+
+# =========================
+# LIMPIEZA PARA GRÁFICOS
+# =========================
+
+import plotly.express as px
+
+# Copia del dataframe original
+df_grafico = df.copy()
+
+# Quitamos "Otros" solo para enfocar el análisis electoral
+df_grafico = df_grafico[df_grafico["Categoria"] != "📌 Otros"]
+
+# Total de titulares por cada medio
+total_por_fuente = (
+    df_grafico.groupby("Fuente")
+    .size()
+    .reset_index(name="Total_medio")
+)
+
+# Cantidad por fuente y categoría
+resumen = (
+    df_grafico.groupby(["Fuente", "Categoria"])
+    .size()
+    .reset_index(name="Cantidad")
+)
+
+# Unimos con el total de cada medio
+resumen = resumen.merge(total_por_fuente, on="Fuente")
+
+# Porcentaje dentro de cada medio
+resumen["Porcentaje_medio"] = (
+    resumen["Cantidad"] / resumen["Total_medio"] * 100
+).round(1)
+
+resumen
