@@ -57,3 +57,73 @@ otros = []
 # =========================
 # DATA FINAL
 # =========================
+
+datos = []
+
+# =========================
+# SCRAPING
+# =========================
+
+for fuente, url in urls.items():
+
+    try:
+        r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
+        soup = BeautifulSoup(r.text, "html.parser")
+
+        titulares = soup.find_all(["h1", "h2", "h3"])
+
+        for t in titulares:
+
+            texto = t.get_text(strip=True)
+
+            if len(texto) < 20:
+                continue
+
+            texto_low = texto.lower()
+
+            # =========================
+            # CLASIFICACIÓN
+            # =========================
+
+            if any(p in texto_low for p in alarmistas):
+                categoria = "🚨 Alarmista"
+
+            elif any(p in texto_low for p in informativas):
+                categoria = "🗳️ Informativa electoral"
+
+            elif any(p in texto_low for p in politicos):
+                categoria = "👤 Política"
+
+            else:
+                categoria = "📌 Otros"
+
+            datos.append({
+                "Fuente": fuente,
+                "Titular": texto,
+                "Categoria": categoria,
+                "Fecha": datetime.now()
+            })
+
+    except Exception as e:
+        print(f"Error en {fuente}: {e}")
+
+# =========================
+# DATAFRAME FINAL
+# =========================
+
+df = pd.DataFrame(datos)
+
+# =========================
+# RESULTADOS
+# =========================
+
+print(df)
+
+# guardar CSV
+df.to_csv("clasificacion_titulares_electorales.csv", index=False)
+
+print("\nArchivo guardado: clasificacion_titulares_electorales.csv")
+
+#Dataframe
+df = df[df["Categoria"] != "📌 Otros"]
+df
