@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 from datetime import datetime
+import time
 
 # =========================
 # MEDIOS
@@ -68,6 +69,11 @@ for fuente, url in urls.items():
 
     try:
         r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
+
+        print(f"\nProcesando: {fuente}")
+        print("Status code:", r.status_code)
+        print("Content-Type:", r.headers.get("Content-Type"))        
+        
         soup = BeautifulSoup(r.text, "html.parser")
 
         titulares = soup.find_all(["h1", "h2", "h3"])
@@ -103,6 +109,7 @@ for fuente, url in urls.items():
                 "Categoria": categoria,
                 "Fecha": datetime.now()
             })
+        time.sleep(2)
 
     except Exception as e:
         print(f"Error en {fuente}: {e}")
