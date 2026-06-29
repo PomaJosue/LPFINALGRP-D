@@ -170,3 +170,27 @@ resumen["Porcentaje_medio"] = (
 ).round(1)
 
 resumen
+
+
+# =====================
+# MAPA DE BURBUJAS
+# =====================
+
+fig2 = px.scatter(
+    resumen,
+    x="Fuente",
+    y="Categoria",
+    size="Porcentaje_medio",
+    color="Categoria",
+    text=resumen["Porcentaje_medio"].astype(str) + "%",
+    hover_name="Fuente",
+    hover_data={
+        "Categoria": True,
+        "Cantidad": True,
+        "Total_medio": True,
+        "Porcentaje_medio": True
+    },
+    size_max=70,
+    title="Mapa de burbujas: peso porcentual de cada tipo de titular por medio"
+)
+
